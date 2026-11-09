@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Lanchonete</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #fff7ec;
+            color: #3a2a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            text-align: center;
+            padding: 16px;
+        }
+        .caixa {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 32px 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            max-width: 420px;
+        }
+        h1 {
+            margin-top: 0;
+            color: #c0392b;
+        }
+        button {
+            background: #e67e22;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 28px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #d35400;
+        }
+        .autor {
+            margin-top: 24px;
+            font-size: 13px;
+            color: #7f6a55;
+        }
+    </style>
+</head>
+<body>
+    <div class="caixa">
+        <h1>🍔 Sistema de Lanchonete</h1>
+        <p>Caixa simplificado para cadastro de produtos, vendas e consulta do total do dia.</p>
+        <button onclick="iniciarSistema()">Abrir sistema</button>
+        <p class="autor">Igor Kaike Diniz dos Santos<br>Engenharia de Software</p>
+    </div>
+    <script>
+        let nomesProdutos = [];
+        let precosProdutos = [];
+        let totaisVendas = [];
+
+        function exibirMenu() {
+            let opcao = prompt(
+                "LANCHONETE - MENU PRINCIPAL\n\n" +
+                "1 - Cadastrar produto\n" +
+                "2 - Listar produtos cadastrados\n" +
+                "3 - Realizar venda\n" +
+                "4 - Consultar total de vendas do dia\n" +
+                "5 - Encerrar o sistema\n\n" +
+                "Digite a opção desejada:"
+            );
+            return opcao;
+        }
+
+        function cadastrarProduto() {
+            let nome = prompt("CADASTRO DE PRODUTO\n\nDigite o nome do produto:");
+
+            if (nome === null) {
+                return;
+            }
+
+            nome = nome.trim();
+
+            if (nome === "") {
+                alert("O nome do produto não pode estar vazio.");
+                return;
+            }
+
+            for (let i = 0; i < nomesProdutos.length; i++) {
+                if (nomesProdutos[i].toLowerCase() === nome.toLowerCase()) {
+                    alert("Já existe um produto cadastrado com o nome \"" + nome + "\".");
+                    return;
+                }
+            }
+
+            let precoDigitado = prompt("Digite o preço do produto \"" + nome + "\":");
+
+            if (precoDigitado === null) {
+                return;
+            }
+
+            let preco = Number(precoDigitado.replace(",", "."));
+
+            if (isNaN(preco) || preco <= 0) {
+                alert("Preço inválido. O preço deve ser maior que zero.");
+                return;
+            }
+
+            let confirmar = confirm(
+                "Confirmar cadastro?\n\n" +
+                "Produto: " + nome + "\n" +
+                "Preço: R$ " + preco.toFixed(2)
+            );
+
+            if (confirmar) {
+                nomesProdutos.push(nome);
+                precosProdutos.push(preco);
+                alert("Produto \"" + nome + "\" cadastrado com sucesso!");
+            } else {
+                alert("Cadastro cancelado.");
+            }
+        }
+
+        function montarListaProdutos() {
+            let lista = "";
+
+            for (let i = 0; i < nomesProdutos.length; i++) {
+                lista += (i + 1) + " - " + nomesProdutos[i] + " - R$ " + precosProdutos[i].toFixed(2) + "\n";
+            }
+
+            return lista;
+        }
+
+        function listarProdutos() {
+            if (nomesProdutos.length === 0) {
+                alert("Não existem produtos cadastrados.");
+                return;
+            }
+
+            alert("PRODUTOS CADASTRADOS\n\nCódigo - Produto - Preço\n\n" + montarListaProdutos());
+        }
+
+        function calcularTotalVenda(preco, quantidade) {
+            return preco * quantidade;
+        }
+
+        function calcularDesconto(total) {
+            if (total > 50) {
+                return total * 0.10;
+            }
+            return 0;
+        }
+
+        function exibirResumoVenda(nome, preco, quantidade, subtotal, desconto) {
+            let valorFinal = subtotal - desconto;
+
+            alert(
+                "RESUMO DA VENDA\n\n" +
+                "Produto: " + nome + "\n" +
+                "Preço unitário: R$ " + preco.toFixed(2) + "\n" +
+                "Quantidade: " + quantidade + "\n" +
+                "Subtotal: R$ " + subtotal.toFixed(2) + "\n" +
+                "Desconto: R$ " + desconto.toFixed(2) + "\n" +
+                "Valor final a pagar: R$ " + valorFinal.toFixed(2)
+            );
+        }
+
+        function realizarVenda() {
+            if (nomesProdutos.length === 0) {
+                alert("Não existem produtos cadastrados. Cadastre um produto antes de realizar uma venda.");
+                return;
+            }
+
+            let codigoDigitado = prompt(
+                "PRODUTOS DISPONÍVEIS\n\n" +
+                montarListaProdutos() +
+                "\nDigite o código do produto:"
+            );
+
+            if (codigoDigitado === null) {
+                return;
+            }
+
+            let codigo = Number(codigoDigitado);
+
+            if (!Number.isInteger(codigo) || codigo < 1 || codigo > nomesProdutos.length) {
+                alert("Código inválido. Produto não encontrado.");
+                return;
+            }
+
+            let indice = codigo - 1;
+            let nome = nomesProdutos[indice];
+            let preco = precosProdutos[indice];
+
+            let quantidadeDigitada = prompt(
+                "Produto: " + nome + "\n" +
+                "Preço unitário: R$ " + preco.toFixed(2) + "\n\n" +
+                "Digite a quantidade desejada:"
+            );
+
+            if (quantidadeDigitada === null) {
+                return;
+            }
+
+            let quantidade = Number(quantidadeDigitada);
+
+            if (!Number.isInteger(quantidade) || quantidade <= 0) {
+                alert("Quantidade inválida. Informe um número inteiro maior que zero.");
+                return;
+            }
+
+            let subtotal = calcularTotalVenda(preco, quantidade);
+            let desconto = calcularDesconto(subtotal);
+            let valorFinal = subtotal - desconto;
+
+            exibirResumoVenda(nome, preco, quantidade, subtotal, desconto);
+
+            if (confirm("Deseja concluir esta venda?")) {
+                totaisVendas.push(valorFinal);
+                alert("Venda concluída com sucesso!");
+            } else {
+                alert("Venda cancelada.");
+            }
+        }
+
+        function obterTotalVendasDia() {
+            let total = 0;
+
+            for (let i = 0; i < totaisVendas.length; i++) {
+                total += totaisVendas[i];
+            }
+
+            return total;
+        }
+
+        function exibirTotalVendasDia() {
+            if (totaisVendas.length === 0) {
+                alert("Não existem vendas registradas.");
+                return;
+            }
+
+            alert(
+                "TOTAL DE VENDAS DO DIA\n\n" +
+                "Quantidade de vendas concluídas: " + totaisVendas.length + "\n" +
+                "Valor total vendido: R$ " + obterTotalVendasDia().toFixed(2)
+            );
+        }
+
+        function iniciarSistema() {
+            let executando = true;
+
+            while (executando) {
+                let opcao = exibirMenu();
+
+                if (opcao === null) {
+                    opcao = "5";
+                }
+
+                opcao = opcao.trim();
+
+                if (opcao === "1") {
+                    cadastrarProduto();
+                } else if (opcao === "2") {
+                    listarProdutos();
+                } else if (opcao === "3") {
+                    realizarVenda();
+                } else if (opcao === "4") {
+                    exibirTotalVendasDia();
+                } else if (opcao === "5") {
+                    if (confirm("Deseja realmente encerrar o sistema?")) {
+                        executando = false;
+                        alert("Sistema encerrado. Até logo!");
+                    }
+                } else {
+                    alert("Opção inválida. Digite um número de 1 a 5.");
+                }
+            }
+        }
+    </script>
+</body>
+</html>
